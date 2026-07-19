@@ -251,6 +251,17 @@ html[lang="ar"] .trk h3{font-family:'Amiri',serif;}
 .gridN{display:grid; grid-template-columns:repeat(10,1fr); gap:4px; margin:10px 0;}
 .gridN div{aspect-ratio:1; border-radius:3px; background:var(--panel2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:.58rem; color:var(--faint);}
 .gridN div.on{background:var(--acc2); color:#fff; border-color:var(--acc2);}
+/* ---- report (constancy calendar) ---- */
+.calmo{padding-bottom:14px;}
+.calmo-h{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;}
+.calmo-n{color:var(--faint); font-size:.72rem;}
+.calhead{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:5px;}
+.calhead div{text-align:center; font-size:.56rem; letter-spacing:.03em; color:var(--faint); text-transform:uppercase;}
+.calgrid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px;}
+.calgrid div{aspect-ratio:1; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:.64rem; color:var(--soft); background:var(--panel2); border:1px solid var(--line);}
+.calgrid .blank{background:none; border:none;}
+.calgrid .kept{background:var(--acc2); color:#fff; border-color:var(--acc2); font-weight:700;}
+.calgrid .today{outline:2px solid var(--acc); outline-offset:1px;}
 
 /* ---- learn ---- */
 details.sec{border-bottom:1px solid var(--line);}
@@ -327,7 +338,8 @@ html[lang="ar"] .csadd{font-family:'Amiri',serif; font-size:1.05rem;}
 .welcome .wname{font-size:.72rem; letter-spacing:.3em; text-transform:uppercase; color:var(--faint); margin-top:8px;}
 html[lang="ar"] .welcome .wname{display:none;}
 .welcome .wphrase{font-family:'Amiri',serif; font-size:1.7rem; color:var(--acc); margin:34px auto 0; direction:rtl; line-height:1.95; max-width:340px; text-align:center;}
-.welcome .wbtn{max-width:280px; margin-top:38px;}
+.welcome .wbtn{width:130px; height:130px; padding:0; border-radius:50%; background:var(--panel); border:1px solid var(--line2); color:var(--ink); font-family:inherit; font-size:1.05rem; letter-spacing:.06em; display:flex; align-items:center; justify-content:center; margin:36px auto 0; cursor:pointer;}
+.welcome .wbtn:active{transform:scale(.97); border-color:var(--acc2);}
 
 .toast{position:fixed; bottom:86px; left:50%; transform:translateX(-50%) translateY(16px); background:var(--ink); color:var(--bg); border-radius:8px; padding:10px 18px; font-size:.84rem; opacity:0; pointer-events:none; transition:all .3s; z-index:90; max-width:86vw; text-align:center;}
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
@@ -433,6 +445,11 @@ html[dir="rtl"] .num, html[dir="rtl"] .ltr{direction:ltr; unicode-bidi:isolate; 
   <div id="yasinbody"></div>
 </div>
 
+<div class="view" id="v-report">
+  <h2 class="vh" data-i18n="r_record">Your record</h2>
+  <div id="reportbody"></div>
+</div>
+
 </div><!-- /wrap -->
 
 <nav class="bottom">
@@ -448,7 +465,7 @@ html[dir="rtl"] .num, html[dir="rtl"] .ltr{direction:ltr; unicode-bidi:isolate; 
     <div class="wbrand ar">بصيرة</div>
     <div class="wname">Baṣīra</div>
     <div class="wphrase ar" id="wphrase"></div>
-    <button class="bigbtn wbtn" onclick="beginApp()" data-i18n="welcome_begin">Enter</button>
+    <button class="wbtn" onclick="beginApp()" data-i18n="welcome_begin">Begin</button>
   </div>
 </div>
 
@@ -823,7 +840,8 @@ en:{
  fb_vibrate:"Vibrate", fb_sound:"Sound", fb_off:"Silent",
  free:"Free count", your_count:"count of your choice — no number transmitted",
  custom_dua:"My duʿāʾ", cd_add:"Add your own duʿāʾ", cd_ph:"Paste or type the Arabic…", cd_name:"A name (optional)", cd_save:"Save", cd_cancel:"Cancel",
- welcome_begin:"Enter", intro_label:"Intro", intro_show:"Show",
+ welcome_begin:"Begin", intro_label:"Intro", intro_show:"Show",
+ r_record:"Your record", r_current:"Current streak", r_longest:"Longest streak", r_total:"Total days", r_month:"This month", r_none:"No days recorded yet.",
  read:"Read", read_sura:"Read the sūra", show_full:"Read in full", bahr_read:"Read the ḥizb here", bahr_ins:"For a knotted need — insert here, once", back:"Back",
  c_afiya:"ʿĀfiya ×3", c_seven:"Sevenfold plea ×7", c_qaf7:"Qāf on the thumbs ×7", c_fajr15:"Fajr wird ×15", c_nur3:"Light Verse ×3", c_yabasir:"Yā Baṣīr ×100",
  d_salawat:"Ṣalawāt", d_shifa:"Ṣalāt al-Shifāʾ", d_ayyub:"Duʿāʾ of Ayyūb ﷺ", d_dhunun:"Duʿāʾ of Dhū al-Nūn", d_nur:"Yā Nūr", d_zahir:"Yā Ẓāhir · Yā Nūr · Yā Baṣīr", d_shakur:"Yā Shakūr", d_yabasir:"Yā Baṣīr", d_istighfar:"Istighfār", d_hawqala:"Lā ḥawla",
@@ -851,7 +869,8 @@ ar:{
  fb_vibrate:"اهتزاز", fb_sound:"صوت", fb_off:"صامت",
  free:"عَدٌّ حُرّ", your_count:"العدد باختيارك — لا عدد منقول",
  custom_dua:"دعائي", cd_add:"أضِف دعاءك", cd_ph:"الصِق أو اكتب النص العربي…", cd_name:"اسم (اختياري)", cd_save:"حفظ", cd_cancel:"إلغاء",
- welcome_begin:"ادخل", intro_label:"التعريف", intro_show:"عرض",
+ welcome_begin:"ابدأ", intro_label:"التعريف", intro_show:"عرض",
+ r_record:"سِجِلّك", r_current:"التتابع الحالي", r_longest:"أطول تتابع", r_total:"مجموع الأيام", r_month:"هذا الشهر", r_none:"لا أيام مسجّلة بعد.",
  read:"اقرأ", read_sura:"اقرأ السورة", show_full:"الدعاء كاملًا", bahr_read:"اقرأ الحزب هنا", bahr_ins:"لحاجةٍ متعقّدة — تُزاد هنا مرةً", back:"رجوع",
  c_afiya:"العافية ×٣", c_seven:"الدعاء السبعي ×٧", c_qaf7:"آية ق ×٧", c_fajr15:"ورد الفجر ×١٥", c_nur3:"آية النور ×٣", c_yabasir:"يا بصير ×١٠٠",
  d_salawat:"الصلاة على النبي ﷺ", d_shifa:"الصلاة الشفائية", d_ayyub:"دعاء أيوب ﷺ", d_dhunun:"دعاء ذي النون", d_nur:"يا نور", d_zahir:"يا ظاهر · يا نور · يا بصير", d_shakur:"يا شكور", d_yabasir:"يا بصير", d_istighfar:"الاستغفار", d_hawqala:"الحوقلة",
@@ -879,7 +898,8 @@ tr:{
  fb_vibrate:"Titreşim", fb_sound:"Ses", fb_off:"Sessiz",
  free:"Serbest sayım", your_count:"sayı senin seçimin — nakledilmiş sayı yok",
  custom_dua:"Duam", cd_add:"Kendi duanı ekle", cd_ph:"Arapça metni yapıştır ya da yaz…", cd_name:"Bir ad (isteğe bağlı)", cd_save:"Kaydet", cd_cancel:"İptal",
- welcome_begin:"Gir", intro_label:"Tanıtım", intro_show:"Göster",
+ welcome_begin:"Başla", intro_label:"Tanıtım", intro_show:"Göster",
+ r_record:"Kaydın", r_current:"Güncel seri", r_longest:"En uzun seri", r_total:"Toplam gün", r_month:"Bu ay", r_none:"Henüz kayıt yok.",
  read:"Oku", read_sura:"Sûreyi oku", show_full:"Tamamını oku", bahr_read:"Hizbi burada oku", bahr_ins:"Düğümlü bir hâcet için — burada bir kez eklenir", back:"Geri",
  c_afiya:"Âfiye ×3", c_seven:"Yedili dua ×7", c_qaf7:"Kâf âyeti ×7", c_fajr15:"Fecir virdi ×15", c_nur3:"Nûr âyeti ×3", c_yabasir:"Yâ Basîr ×100",
  d_salawat:"Salavât", d_shifa:"Salât-ı Şifâ", d_ayyub:"Eyyûb'un ﷺ duası", d_dhunun:"Zünnûn duası", d_nur:"Yâ Nûr", d_zahir:"Yâ Zâhir · Yâ Nûr · Yâ Basîr", d_shakur:"Yâ Şekûr", d_yabasir:"Yâ Basîr", d_istighfar:"İstiğfar", d_hawqala:"Lâ havle",
@@ -1198,6 +1218,7 @@ function applyLang(){
   if(l.t==="prog") renderProgramBody(l.id);
   if(l.v==="bahr") renderBahr();
   if(l.v==="yasin") renderYasin();
+  if(l.v==="report") renderReport();
 }
 /* ---------- Ḥizb al-Baḥr reading (self-contained) ---------- */
 function renderBahr(){
@@ -1236,6 +1257,7 @@ function applyLoc(){
   if(l.v==="about") renderAbout();
   if(l.v==="bahr") renderBahr();
   if(l.v==="yasin") renderYasin();
+  if(l.v==="report") renderReport();
   $("backbtn").classList.toggle("show", navstack.length>1);
   if(l.v==="yasin"||l.v==="bahr"){ const y=readScroll[l.v]||0; requestAnimationFrame(()=>window.scrollTo({top:y})); }
   else window.scrollTo({top:0});
@@ -1374,6 +1396,7 @@ function renderIst(p){
   h+=`<div class="ctl-row" style="justify-content:flex-start">
       <button class="smallbtn" onclick="istMark()">${T("rec_today")}</button></div>
       <button class="linkbtn ${istArmed?'warn':''}" onclick="istReset()">${istArmed?T("restart_confirm"):T("restart")}</button></div>`;
+  h+=`<button class="bigbtn ghost" style="margin-top:8px" onclick="openView('report')">${T("r_record")}</button>`;
   h+=`<p class="pnote">${p.foot}</p>`;
   return h;
 }
@@ -1382,6 +1405,51 @@ function istMark(){ prog.ist.days[today()]=1; store.save(); toast(T("recorded"))
 function istReset(){
   if(!istArmed){ istArmed=true; renderProgramBody("istiqama"); if(istReset._t) clearTimeout(istReset._t); istReset._t=setTimeout(()=>{ istArmed=false; if(loc().t==="prog"&&loc().id==="istiqama") renderProgramBody("istiqama"); },3500); return; }
   clearTimeout(istReset._t); istArmed=false; prog.ist.days={}; store.save(); renderProgramBody("istiqama");
+}
+/* ---------- constancy report (calendar of kept days) ---------- */
+function longestStreak(){
+  const keys=Object.keys(prog.ist.days).sort();
+  if(!keys.length) return 0;
+  let best=1,cur=1;
+  for(let i=1;i<keys.length;i++){
+    const p=keys[i-1].split("-").map(Number), prev=new Date(p[0],p[1]-1,p[2]); prev.setDate(prev.getDate()+1);
+    if(prev.toLocaleDateString("en-CA")===keys[i]){ cur++; if(cur>best) best=cur; } else cur=1;
+  }
+  return best;
+}
+function renderReport(){
+  const lc={en:"en",ar:"ar",tr:"tr"}[lang]||"en";
+  const days=prog.ist.days, keys=Object.keys(days);
+  const dg=lang==="ar"?arNum:(x=>String(x));
+  const nowKey=today(), thisYm=nowKey.slice(0,7);
+  const monthCount=keys.filter(k=>k.slice(0,7)===thisYm).length;
+  let h=`<div class="statgrid">
+    <div class="stat"><div class="sv">${dg(streak())}</div><div class="sl">${T("r_current")}</div></div>
+    <div class="stat"><div class="sv">${dg(longestStreak())}</div><div class="sl">${T("r_longest")}</div></div>
+    <div class="stat"><div class="sv">${dg(keys.length)}</div><div class="sl">${T("r_total")}</div></div>
+    <div class="stat"><div class="sv">${dg(monthCount)}</div><div class="sl">${T("r_month")}</div></div>
+  </div>`;
+  let wh="";
+  for(let i=0;i<7;i++){ wh+=`<div>${new Intl.DateTimeFormat(lc,{weekday:"narrow"}).format(new Date(2024,0,1+i))}</div>`; }
+  const stopYm = keys.length ? keys.reduce((a,b)=>a<b?a:b).slice(0,7) : thisYm;
+  const now=new Date(); let cursor=new Date(now.getFullYear(),now.getMonth(),1), guard=0;
+  while(guard<12){
+    const y=cursor.getFullYear(), mo=cursor.getMonth(), ym=`${y}-${String(mo+1).padStart(2,"0")}`;
+    const first=new Date(y,mo,1), offset=(first.getDay()+6)%7, dim=new Date(y,mo+1,0).getDate();
+    const kept=keys.filter(k=>k.slice(0,7)===ym).length;
+    const title=dg(new Intl.DateTimeFormat(lc,{month:"long",year:"numeric"}).format(first));
+    let cells="";
+    for(let b=0;b<offset;b++) cells+=`<div class="blank"></div>`;
+    for(let d=1;d<=dim;d++){ const key=`${ym}-${String(d).padStart(2,"0")}`;
+      cells+=`<div class="${days[key]?"kept":""}${key===nowKey?" today":""}">${dg(d)}</div>`; }
+    h+=`<div class="trk calmo"><div class="calmo-h"><h3 style="margin:0">${title}</h3><span class="calmo-n">${dg(kept)} ${T("days")}</span></div>
+      <div class="calhead">${wh}</div><div class="calgrid">${cells}</div></div>`;
+    if(ym===stopYm) break;
+    cursor.setMonth(cursor.getMonth()-1); guard++;
+  }
+  if(!keys.length) h+=`<p class="pnote">${T("r_none")}</p>`;
+  h+=`<button class="bigbtn ghost" onclick="navBack()">${T("back")}</button>`;
+  $("reportbody").innerHTML=h;
 }
 
 /* ---------- integrated counter ---------- */
