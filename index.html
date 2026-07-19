@@ -262,6 +262,15 @@ html[lang="ar"] .trk h3{font-family:'Amiri',serif;}
 .calgrid .blank{background:none; border:none;}
 .calgrid .kept{background:var(--acc2); color:#fff; border-color:var(--acc2); font-weight:700;}
 .calgrid .today{outline:2px solid var(--acc); outline-offset:1px;}
+.calgrid .tap{cursor:pointer;}
+.daygrp{margin:2px 0 15px;}
+.daygrp-h{display:flex; justify-content:space-between; align-items:baseline; font-family:Georgia,'Times New Roman',serif; font-size:.92rem; color:var(--faint); border-bottom:1px solid var(--line); padding-bottom:6px; margin-bottom:7px;}
+html[lang="ar"] .daygrp-h{font-family:'Amiri',serif;}
+.daygrp-n{color:var(--ink);}
+.dayrow{display:flex; align-items:flex-start; gap:9px; padding:5px 0; font-size:.82rem; color:var(--soft); line-height:1.5;}
+.dayck{flex:0 0 16px; text-align:center;}
+.dayck.y{color:var(--acc2);}
+.dayck.n{color:var(--faint);}
 
 /* ---- learn ---- */
 details.sec{border-bottom:1px solid var(--line);}
@@ -338,8 +347,12 @@ html[lang="ar"] .csadd{font-family:'Amiri',serif; font-size:1.05rem;}
 .welcome .wname{font-size:.72rem; letter-spacing:.3em; text-transform:uppercase; color:var(--faint); margin-top:8px;}
 html[lang="ar"] .welcome .wname{display:none;}
 .welcome .wphrase{font-family:'Amiri',serif; font-size:1.7rem; color:var(--acc); margin:34px auto 0; direction:rtl; line-height:1.95; max-width:340px; text-align:center;}
-.welcome .wbtn{width:130px; height:130px; padding:0; border-radius:50%; background:var(--panel); border:1px solid var(--line2); color:var(--ink); font-family:inherit; font-size:1.05rem; letter-spacing:.06em; display:flex; align-items:center; justify-content:center; margin:36px auto 0; cursor:pointer;}
-.welcome .wbtn:active{transform:scale(.97); border-color:var(--acc2);}
+.welcome .wbtn{width:120px; height:120px; padding:0; border-radius:50%; background:var(--panel); border:1px solid var(--line2); display:flex; align-items:center; justify-content:center; margin:38px auto 0; cursor:pointer; animation:wbreathe 4s ease-in-out infinite;}
+.welcome .wbtn::before{content:""; width:11px; height:11px; border-radius:50%; background:var(--acc2); animation:wdot 4s ease-in-out infinite;}
+.welcome .wbtn:active{animation:none; transform:scale(.96);}
+@keyframes wbreathe{0%,100%{transform:scale(1);} 50%{transform:scale(1.055);}}
+@keyframes wdot{0%,100%{opacity:.35;} 50%{opacity:.7;}}
+@media (prefers-reduced-motion: reduce){.welcome .wbtn,.welcome .wbtn::before{animation:none;}}
 
 .toast{position:fixed; bottom:86px; left:50%; transform:translateX(-50%) translateY(16px); background:var(--ink); color:var(--bg); border-radius:8px; padding:10px 18px; font-size:.84rem; opacity:0; pointer-events:none; transition:all .3s; z-index:90; max-width:86vw; text-align:center;}
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
@@ -465,7 +478,7 @@ html[dir="rtl"] .num, html[dir="rtl"] .ltr{direction:ltr; unicode-bidi:isolate; 
     <div class="wbrand ar">بصيرة</div>
     <div class="wname">Baṣīra</div>
     <div class="wphrase ar" id="wphrase"></div>
-    <button class="wbtn" onclick="beginApp()" data-i18n="welcome_begin">Begin</button>
+    <button class="wbtn" onclick="beginApp()" aria-label="Begin"></button>
   </div>
 </div>
 
@@ -473,6 +486,12 @@ html[dir="rtl"] .num, html[dir="rtl"] .ltr{direction:ltr; unicode-bidi:isolate; 
   <div class="csbox">
     <div class="csheet-h" data-i18n="pick_h">What to count</div>
     <div id="cslist"></div>
+  </div>
+</div>
+<div class="csheet" id="daysheet" role="dialog" aria-modal="true" onclick="if(event.target===this)closeDaySheet()">
+  <div class="csbox">
+    <div class="csheet-h" id="dayhead"></div>
+    <div id="daybody"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -822,7 +841,7 @@ const WELCOME_PHRASES=[
 const UI = {
 en:{
  brand_sub:"Baṣīra", nav_today:"Today", nav_programs:"Programs", nav_library:"Library", nav_counter:"Counter",
- today_wird:"Today's Wird", wird_done:"Complete — taqabbala Llāh", day_streak:"day streak", today_label:"done today",
+ today_wird:"Today's Wird", wird_done:"taqabbala Llāh", day_streak:"day streak", today_label:"done today",
  about_h:"About & Safety", text_size:"Text size", theme_label:"Appearance", theme_dark:"Dark", theme_light:"Light",
  epigraph_who:"“…and place in my sight light.” — the Prophet ﷺ<span class=\"esrc\">al-Bukhārī &amp; Muslim</span>",
  lib_h:"The Library",
@@ -841,7 +860,7 @@ en:{
  free:"Free count", your_count:"count of your choice — no number transmitted",
  custom_dua:"My duʿāʾ", cd_add:"Add your own duʿāʾ", cd_ph:"Paste or type the Arabic…", cd_name:"A name (optional)", cd_save:"Save", cd_cancel:"Cancel",
  welcome_begin:"Begin", intro_label:"Intro", intro_show:"Show",
- r_record:"Your record", r_current:"Current streak", r_longest:"Longest streak", r_total:"Total days", r_month:"This month", r_none:"No days recorded yet.",
+ r_record:"Your record", r_current:"Current streak", r_longest:"Longest streak", r_total:"Total days", r_month:"This month", r_none:"No days recorded yet.", r_nodetail:"Kept — no step detail for this day.", r_notkept:"Not kept this day.",
  read:"Read", read_sura:"Read the sūra", show_full:"Read in full", bahr_read:"Read the ḥizb here", bahr_ins:"For a knotted need — insert here, once", back:"Back",
  c_afiya:"ʿĀfiya ×3", c_seven:"Sevenfold plea ×7", c_qaf7:"Qāf on the thumbs ×7", c_fajr15:"Fajr wird ×15", c_nur3:"Light Verse ×3", c_yabasir:"Yā Baṣīr ×100",
  d_salawat:"Ṣalawāt", d_shifa:"Ṣalāt al-Shifāʾ", d_ayyub:"Duʿāʾ of Ayyūb ﷺ", d_dhunun:"Duʿāʾ of Dhū al-Nūn", d_nur:"Yā Nūr", d_zahir:"Yā Ẓāhir · Yā Nūr · Yā Baṣīr", d_shakur:"Yā Shakūr", d_yabasir:"Yā Baṣīr", d_istighfar:"Istighfār", d_hawqala:"Lā ḥawla",
@@ -851,7 +870,7 @@ en:{
 },
 ar:{
  brand_sub:"بصيرة", nav_today:"اليوم", nav_programs:"البرامج", nav_library:"المكتبة", nav_counter:"العدّاد",
- today_wird:"وِرد اليوم", wird_done:"تمّ — تقبّل الله", day_streak:"أيام متتالية", today_label:"أُنجز اليوم",
+ today_wird:"وِرد اليوم", wird_done:"تقبّل الله", day_streak:"أيام متتالية", today_label:"أُنجز اليوم",
  about_h:"العلم والسلامة", text_size:"حجم النص", theme_label:"المظهر", theme_dark:"داكن", theme_light:"فاتح",
  epigraph_who:"— النبي ﷺ<span class=\"esrc\">البخاري ومسلم</span>",
  lib_h:"المكتبة",
@@ -870,7 +889,7 @@ ar:{
  free:"عَدٌّ حُرّ", your_count:"العدد باختيارك — لا عدد منقول",
  custom_dua:"دعائي", cd_add:"أضِف دعاءك", cd_ph:"الصِق أو اكتب النص العربي…", cd_name:"اسم (اختياري)", cd_save:"حفظ", cd_cancel:"إلغاء",
  welcome_begin:"ابدأ", intro_label:"التعريف", intro_show:"عرض",
- r_record:"سِجِلّك", r_current:"التتابع الحالي", r_longest:"أطول تتابع", r_total:"مجموع الأيام", r_month:"هذا الشهر", r_none:"لا أيام مسجّلة بعد.",
+ r_record:"سِجِلّك", r_current:"التتابع الحالي", r_longest:"أطول تتابع", r_total:"مجموع الأيام", r_month:"هذا الشهر", r_none:"لا أيام مسجّلة بعد.", r_nodetail:"محفوظ — لا تفصيل للخطوات في هذا اليوم.", r_notkept:"لم يُحفَظ في هذا اليوم.",
  read:"اقرأ", read_sura:"اقرأ السورة", show_full:"الدعاء كاملًا", bahr_read:"اقرأ الحزب هنا", bahr_ins:"لحاجةٍ متعقّدة — تُزاد هنا مرةً", back:"رجوع",
  c_afiya:"العافية ×٣", c_seven:"الدعاء السبعي ×٧", c_qaf7:"آية ق ×٧", c_fajr15:"ورد الفجر ×١٥", c_nur3:"آية النور ×٣", c_yabasir:"يا بصير ×١٠٠",
  d_salawat:"الصلاة على النبي ﷺ", d_shifa:"الصلاة الشفائية", d_ayyub:"دعاء أيوب ﷺ", d_dhunun:"دعاء ذي النون", d_nur:"يا نور", d_zahir:"يا ظاهر · يا نور · يا بصير", d_shakur:"يا شكور", d_yabasir:"يا بصير", d_istighfar:"الاستغفار", d_hawqala:"الحوقلة",
@@ -880,7 +899,7 @@ ar:{
 },
 tr:{
  brand_sub:"Basîra", nav_today:"Bugün", nav_programs:"Programlar", nav_library:"Külliyat", nav_counter:"Sayaç",
- today_wird:"Bugünün Virdi", wird_done:"Tamam — taqabbalallâh", day_streak:"gün üst üste", today_label:"bugün yapıldı",
+ today_wird:"Bugünün Virdi", wird_done:"taqabbalallâh", day_streak:"gün üst üste", today_label:"bugün yapıldı",
  about_h:"Bilgi ve Güvenlik", text_size:"Yazı boyutu", theme_label:"Görünüm", theme_dark:"Koyu", theme_light:"Açık",
  epigraph_who:"“…gözüme nur ver.” — Peygamber ﷺ<span class=\"esrc\">Buhârî &amp; Müslim</span>",
  lib_h:"Külliyat",
@@ -899,7 +918,7 @@ tr:{
  free:"Serbest sayım", your_count:"sayı senin seçimin — nakledilmiş sayı yok",
  custom_dua:"Duam", cd_add:"Kendi duanı ekle", cd_ph:"Arapça metni yapıştır ya da yaz…", cd_name:"Bir ad (isteğe bağlı)", cd_save:"Kaydet", cd_cancel:"İptal",
  welcome_begin:"Başla", intro_label:"Tanıtım", intro_show:"Göster",
- r_record:"Kaydın", r_current:"Güncel seri", r_longest:"En uzun seri", r_total:"Toplam gün", r_month:"Bu ay", r_none:"Henüz kayıt yok.",
+ r_record:"Kaydın", r_current:"Güncel seri", r_longest:"En uzun seri", r_total:"Toplam gün", r_month:"Bu ay", r_none:"Henüz kayıt yok.", r_nodetail:"Tutuldu — bu gün için adım detayı yok.", r_notkept:"Bu gün tutulmadı.",
  read:"Oku", read_sura:"Sûreyi oku", show_full:"Tamamını oku", bahr_read:"Hizbi burada oku", bahr_ins:"Düğümlü bir hâcet için — burada bir kez eklenir", back:"Geri",
  c_afiya:"Âfiye ×3", c_seven:"Yedili dua ×7", c_qaf7:"Kâf âyeti ×7", c_fajr15:"Fecir virdi ×15", c_nur3:"Nûr âyeti ×3", c_yabasir:"Yâ Basîr ×100",
  d_salawat:"Salavât", d_shifa:"Salât-ı Şifâ", d_ayyub:"Eyyûb'un ﷺ duası", d_dhunun:"Zünnûn duası", d_nur:"Yâ Nûr", d_zahir:"Yâ Zâhir · Yâ Nûr · Yâ Basîr", d_shakur:"Yâ Şekûr", d_yabasir:"Yâ Basîr", d_istighfar:"İstiğfar", d_hawqala:"Lâ havle",
@@ -1179,7 +1198,7 @@ const YASIN_INTRO={
 /* ================= BAṢĪRA logic v4 — app navigation · quiet chrome · integrated counter ================= */
 let uz=1, mainCounter={n:0,target:3}, gradeFilter="all", cSel="afiya", customDuas=[], csAdding=false, istArmed=false;
 let lang="en"; const LANGS=["en","ar","tr"];
-let prog={ daily:{}, banuri:{}, masters:{}, ist:{target:0, days:{}}, dist:{} };
+let prog={ daily:{}, banuri:{}, masters:{}, ist:{target:0, days:{}}, dist:{}, log:{} };
 const store={ save(){}, load(){return null;} };
 
 function $(id){return document.getElementById(id);}
@@ -1273,6 +1292,7 @@ function openProgram(id){ navstack.push({t:"prog",id}); applyLoc(); }
 function openView(v){ navstack.push({t:"view",v}); applyLoc(); }
 function navBack(){
   if($("csheet").classList.contains("on")){ closeCsheet(); return; }
+  if($("daysheet").classList.contains("on")){ closeDaySheet(); return; }
   if(navstack.length>1){ navstack.pop(); applyLoc(); }          /* drilled in -> pop */
   else if(loc().v!=="today"){ navstack=[{t:"view",v:"today"}]; applyLoc(); }  /* root tab -> today */
 }
@@ -1375,9 +1395,10 @@ function stepTap(pid,key){
   buzz(8); if(state[key]) tick();
   /* completing the day's practice records the streak automatically */
   if((pid==="daily"||pid==="masters") && allCoreDone(pid) && !prog.ist.days[today()]){ prog.ist.days[today()]=1; buzz([25,50,25]); tick(true); toast(T("recorded")); }
-  store.save(); renderProgramBody(pid);
+  logDay(); store.save(); renderProgramBody(pid);
 }
-function finishDay(){ prog.ist.days[today()]=1; store.save(); toast(T("recorded")); updateDayNote(); }
+function finishDay(){ prog.ist.days[today()]=1; logDay(); store.save(); toast(T("recorded")); updateDayNote(); }
+function logDay(){ if(!prog.log) prog.log={}; prog.log[today()]={daily:Object.assign({},prog.daily), banuri:Object.assign({},prog.banuri), masters:Object.assign({},prog.masters)}; }
 function updateDayNote(){ const n=$("daynote"); if(!n) return; n.textContent=`${T("days_rec")}: ${Object.keys(prog.ist.days).length} · ${T("streak")}: ${streak()}`; }
 function today(){ return new Date().toLocaleDateString("en-CA"); }
 /* streak counts consecutive recorded days; today un-kept is "pending", not a break —
@@ -1440,8 +1461,8 @@ function renderReport(){
     const title=dg(new Intl.DateTimeFormat(lc,{month:"long",year:"numeric"}).format(first));
     let cells="";
     for(let b=0;b<offset;b++) cells+=`<div class="blank"></div>`;
-    for(let d=1;d<=dim;d++){ const key=`${ym}-${String(d).padStart(2,"0")}`;
-      cells+=`<div class="${days[key]?"kept":""}${key===nowKey?" today":""}">${dg(d)}</div>`; }
+    for(let d=1;d<=dim;d++){ const key=`${ym}-${String(d).padStart(2,"0")}`, clickable=key<=nowKey;
+      cells+=`<div class="${days[key]?"kept":""}${key===nowKey?" today":""}${clickable?" tap":""}"${clickable?` onclick="dayDetail('${key}')"`:""}>${dg(d)}</div>`; }
     h+=`<div class="trk calmo"><div class="calmo-h"><h3 style="margin:0">${title}</h3><span class="calmo-n">${dg(kept)} ${T("days")}</span></div>
       <div class="calhead">${wh}</div><div class="calgrid">${cells}</div></div>`;
     if(ym===stopYm) break;
@@ -1450,6 +1471,25 @@ function renderReport(){
   if(!keys.length) h+=`<p class="pnote">${T("r_none")}</p>`;
   h+=`<button class="bigbtn ghost" onclick="navBack()">${T("back")}</button>`;
   $("reportbody").innerHTML=h;
+}
+function closeDaySheet(){ $("daysheet").classList.remove("on"); }
+function dayDetail(key){
+  const lc={en:"en",ar:"ar",tr:"tr"}[lang]||"en", dg=lang==="ar"?arNum:(x=>String(x));
+  const p=key.split("-").map(Number);
+  $("dayhead").textContent=dg(new Intl.DateTimeFormat(lc,{weekday:"long",day:"numeric",month:"long"}).format(new Date(p[0],p[1]-1,p[2])));
+  const log=(prog.log||{})[key], kept=!!prog.ist.days[key];
+  let h="";
+  ["daily","banuri","masters"].forEach(id=>{
+    const P=PG9(PROGRAMS.find(x=>x.id===id)); if(!P||!P.steps) return;
+    const st=log&&log[id]; if(!st) return;
+    const done=P.steps.filter(s=>st[s.k]).length; if(!done) return;
+    h+=`<div class="daygrp"><div class="daygrp-h"><span class="daygrp-n">${P.nm}</span><span>${dg(done)}/${dg(P.steps.length)}</span></div>`;
+    P.steps.forEach(s=>{ const d=!!st[s.k]; h+=`<div class="dayrow"><span class="dayck ${d?"y":"n"}">${d?"✓":"○"}</span><span class="dayrow-l">${s.en}</span></div>`; });
+    h+=`</div>`;
+  });
+  if(!h) h=`<p class="pnote" style="text-align:center">${kept?T("r_nodetail"):T("r_notkept")}</p>`;
+  $("daybody").innerHTML=h;
+  $("daysheet").classList.add("on");
 }
 
 /* ---------- integrated counter ---------- */
@@ -1610,13 +1650,13 @@ function renderToday(){
     <div class="tcard hero ${recd?'done':''}" onclick="openProgram('daily')">
       <div class="tc-row"><div class="tc-title">${T("today_wird")}</div>
         <svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-      <div class="tc-sub">${recd?T("wird_done"):`${dg(dp.done)} ${T("of")} ${dg(dp.total)}`}</div>
+      <div class="tc-sub">${dg(dp.done)} ${T("of")} ${dg(dp.total)}${recd?` · ${T("wird_done")}`:""}</div>
       <div class="pbar"><div class="pfill" style="width:${recd?100:pct}%"></div></div>
     </div>
-    <div class="tcard" onclick="openProgram('banuri')">
+    <div class="tcard ${bp.total&&bp.done>=bp.total?'done':''}" onclick="openProgram('banuri')">
       <div class="tc-row"><div class="tc-title">${bpName}</div>
         <svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-      <div class="tc-sub">${dg(bp.done)} ${T("of")} ${dg(bp.total)}</div>
+      <div class="tc-sub">${dg(bp.done)} ${T("of")} ${dg(bp.total)}${bp.total&&bp.done>=bp.total?" · ✓":""}</div>
       <div class="pbar"><div class="pfill" style="width:${bpct}%"></div></div>
     </div>
     <div class="statgrid">
